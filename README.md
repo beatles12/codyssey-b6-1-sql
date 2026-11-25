@@ -42,19 +42,29 @@ SQLite를 이용해 회원, 카테고리, 거래, 예산 정보를
 - Q15 : CREATE INDEX
 
 ## 6. 실행 환경 및 방법
-Windows와 Python 내장 sqlite3를 사용합니다.
 
-1. Python이 설치된 환경에서 프로젝트 폴더를 엽니다.
-2. schema.sql을 실행해 테이블을 생성합니다.
-3. data.sql을 실행해 샘플 데이터를 입력합니다.
-4. queries.sql을 순서대로 실행합니다.
-5. results/sql-results.txt에서 결과를 확인합니다.
+- OS: Windows
+- DB: SQLite 3.50.4
+- 실행 도구: Python 내장 sqlite3
 
-SQLite 외래키 검사는
+프로젝트 폴더에서 PowerShell을 실행합니다.
+
+아래 명령어는 메모리에 임시 DB를 생성하므로
+기존 budget.db를 변경하지 않습니다.
+
+```powershell
+py -c "import sqlite3,pathlib; d=sqlite3.connect(':memory:'); [d.executescript(pathlib.Path(f).read_text(encoding='utf-8')) for f in ('schema.sql','data.sql')]; q=[s for s in pathlib.Path('queries.sql').read_text(encoding='utf-8').split(';') if s.strip()]; [d.execute(s) for s in q]; print('PASS:',len(q),'SQL queries'); d.close()"
+```
+
+정상 실행 시 다음 메시지가 출력됩니다.
+
+PASS: 15 SQL queries
+
+각 SQL의 상세 실행 결과는
+results/sql-results.txt에서 확인할 수 있습니다.
+
+외래키 검사는 schema.sql의
 PRAGMA foreign_keys = ON으로 활성화합니다.
-
-UPDATE와 DELETE는 데이터를 변경하므로
-원본이 아닌 임시 데이터베이스에서 검증했습니다.
 
 ## 7. 테스트 결과
 - 테이블 4개 생성 성공
